@@ -1,74 +1,102 @@
-# security-web-hook
+# 🔒 Security Web Hook
 
-Pre-commit Git hook that blocks commits containing secrets, PII, vulnerabilities, insecure IaC, and Docker misconfigurations using **5 security tools**.
+> A pre-commit Git hook that **automatically scans your code before every commit** and blocks secrets, vulnerabilities, and misconfigurations from reaching your repository.
 
-## Tools
+---
 
-| # | Tool | Purpose |
-|---|------|---------|
-| 1 | **Gitleaks** | Secret & PII scanning (API keys, tokens, passwords, emails, phone numbers, .env files) |
-| 2 | **Checkov** | IaC misconfiguration scanning (Terraform, YAML, Dockerfile) |
-| 3 | **Semgrep** | Static analysis / SAST (code vulnerabilities) |
-| 4 | **Trivy** | Vulnerability scanning (dependencies, containers) |
-| 5 | **Dockle** | Docker image best practices & CIS benchmarks |
-
-## Prerequisites
+## ⚡ Quick Start (3 steps)
 
 ```bash
-# Gitleaks - secret scanning
-brew install gitleaks
+# 1. Clone the repo
+git clone https://github.com/rameshlodh/security-web-hook.git
 
-# Checkov - IaC security
-pip install checkov
+# 2. Go into the project
+cd security-web-hook
 
-# Semgrep - static analysis
-pip install semgrep
-
-# Trivy - vulnerability scanning
-brew install trivy
-
-# Dockle - Docker best practices
-brew install goodwithtech/r/dockle
-```
-
-## Setup
-
-```bash
+# 3. Install the hook
 ./install.sh
 ```
 
-## Project Structure
+That's it! The hook is now active. Every `git commit` will be scanned automatically.
+
+---
+
+## 🛡️ What It Catches
+
+| Tool | What it detects | Example |
+|------|----------------|---------|
+| **Gitleaks** | Secrets & PII | API keys, passwords, emails, phone numbers, `.env` files |
+| **Checkov** | IaC misconfigs | Insecure S3 buckets, open security groups, missing encryption |
+| **Semgrep** | Code vulnerabilities | SQL injection, XSS, hardcoded secrets in code |
+| **Trivy** | Dependency CVEs | Known vulnerabilities in packages |
+| **Dockle** | Docker issues | Missing USER instruction, running as root |
+
+---
+
+## 📋 Prerequisites
+
+Install the security tools (macOS):
+
+```bash
+brew install gitleaks          # Secret scanning
+brew install trivy             # Vulnerability scanning
+brew install goodwithtech/r/dockle  # Docker scanning
+pip install checkov            # IaC security
+pip install semgrep            # Static analysis
+```
+
+> 💡 Don't worry — if a tool is not installed, the hook **skips it** with a warning. Other checks still run.
+
+---
+
+## 📁 Project Structure
 
 ```
 security-web-hook/
-├── hooks/pre-commit   # Pre-commit hook (5 security checks)
-├── install.sh         # One-command installer
-├── .gitleaks.toml     # Custom Gitleaks rules (secrets + PII detection)
-├── .gitignore         # Prevents .env from being tracked
-└── README.md
+├── hooks/pre-commit   ← The hook script (runs 5 security checks)
+├── install.sh         ← One-command installer
+├── .gitleaks.toml     ← Custom rules (PII + secret patterns)
+├── .gitignore         ← Blocks .env from being committed
+├── LICENSE            ← MIT License
+└── README.md          ← You are here
 ```
 
-## How It Works
+---
 
-On every `git commit`, the hook runs these checks on **staged files only**:
-
-1. **Gitleaks** → scans for secrets & PII (API keys, tokens, passwords, emails, phone numbers, .env files)
-2. **Checkov** → scans IaC files (`.tf`, `.yml`, `.yaml`, `.json`, `Dockerfile`)
-3. **Semgrep** → static analysis on code (`.py`, `.js`, `.ts`, `.java`, `.go`, `.rb`, `.php`, `.c`, `.cpp`)
-4. **Trivy** → scans dependency files (`package-lock.json`, `requirements.txt`, `go.sum`, `pom.xml`, etc.)
-5. **Dockle** → checks Docker image against CIS benchmarks (requires a built image)
-
-If **any** check fails → commit is **blocked**.  
-If a tool is not installed → shows ⚠️ warning and skips (other checks still run).
-
-## Detailed Findings Report
-
-When issues are found, the hook shows **severity, file, line number, and rule**:
+## 🔄 How It Works
 
 ```
-🔒 Running security checks before commit...
+git commit -m "my changes"
+        │
+        ▼
+┌─────────────────────────────┐
+│   PRE-COMMIT HOOK RUNS      │
+│                             │
+│  1. Gitleaks  → secrets?    │
+│  2. Checkov   → IaC safe?   │
+│  3. Semgrep   → code safe?  │
+│  4. Trivy     → deps safe?  │
+│  5. Dockle    → docker ok?  │
+│                             │
+└──────────┬──────────────────┘
+           │
+     ┌─────┴─────┐
+     │           │
+  ALL PASS    ANY FAIL
+     │           │
+     ▼           ▼
+  ✅ Commit    🚫 Blocked
+  goes through   (fix issues first)
+```
 
-🔍 [1/5] Running Gitleaks (secret scanning)...
+---
+
+## 📊 Detailed Findings Report
+
+When the hook finds issues, it shows **exactly what and where**:
+
+### Secrets / PII detected:
+```
 ❌ Gitleaks found secrets:
 ┌──────────────────────────────────────────────────────────
 │ Finding #1
@@ -84,14 +112,10 @@ When issues are found, the hook shows **severity, file, line number, and rule**:
 │   Line:     3
 │   Secret:   mob: 123456789
 │   Severity: HIGH
-│
 └──────────────────────────────────────────────────────────
-
-🚫 Security checks FAILED. Commit blocked. Fix the issues above.
 ```
 
-### Other tool finding formats:
-
+### IaC misconfigurations:
 ```
 ❌ Checkov found issues:
 ┌──────────────────────────────────────────────────────────
@@ -99,21 +123,30 @@ When issues are found, the hook shows **severity, file, line number, and rule**:
 │   File: /main.tf
 │   Resource: aws_s3_bucket.example
 └──────────────────────────────────────────────────────────
+```
 
+### Code vulnerabilities:
+```
 ❌ Semgrep found issues:
 ┌──────────────────────────────────────────────────────────
 │ [ERROR] python.flask.security.injection.sql-injection
 │   File: app.py:15
 │   Message: Possible SQL injection via string concatenation
 └──────────────────────────────────────────────────────────
+```
 
+### Dependency vulnerabilities:
+```
 ❌ Trivy found vulnerabilities:
 ┌──────────────────────────────────────────────────────────
 │ [CRITICAL] CVE-2023-1234: express
 │   File: package-lock.json
 │   Title: Prototype pollution in Express
 └──────────────────────────────────────────────────────────
+```
 
+### Docker issues:
+```
 ❌ Dockle found issues:
 ┌──────────────────────────────────────────────────────────
 │ [FATAL] CIS-DI-0001: Create a user for the container
@@ -121,18 +154,9 @@ When issues are found, the hook shows **severity, file, line number, and rule**:
 └──────────────────────────────────────────────────────────
 ```
 
-## Custom Rules (`.gitleaks.toml`)
+---
 
-In addition to Gitleaks default rules (AWS keys, GitHub tokens, private keys, etc.), custom rules detect:
-
-| Rule | Catches |
-|------|---------|
-| `generic-password` | Any `password:`, `secret:`, `token:` assignments |
-| `env-file` | Any content in `.env` files |
-| `email-address` | Email addresses in any file |
-| `phone-number` | Phone/mobile numbers in any file |
-
-## Successful Commit
+## ✅ Clean Commit (all checks pass)
 
 ```
 🔒 Running security checks before commit...
@@ -155,17 +179,45 @@ In addition to Gitleaks default rules (AWS keys, GitHub tokens, private keys, et
 🎉 All security checks passed. Proceeding with commit.
 ```
 
-## Bypass (emergency only)
+---
+
+## 🛠️ Custom Rules (`.gitleaks.toml`)
+
+Beyond default secret patterns, the hook detects:
+
+| Rule | What it catches |
+|------|----------------|
+| `generic-password` | `password:`, `secret:`, `token:` assignments |
+| `env-file` | Any content in `.env` files |
+| `email-address` | Email addresses in any file |
+| `phone-number` | Phone/mobile numbers in any file |
+
+---
+
+## ⚠️ Bypass (emergency only)
 
 ```bash
 git commit --no-verify -m "your message"
 ```
 
-## Removing a Previously Committed Secret
+> ⚠️ Use this only when you're sure the flagged content is safe (e.g., test fixtures, documentation examples).
+
+---
+
+## 🧹 Fix: Remove a Previously Committed Secret
+
+If a secret was committed before the hook was installed:
 
 ```bash
+# Remove from git tracking (file stays on disk)
 git rm --cached .env
 git commit -m "remove .env from tracking"
 ```
 
-The `.gitignore` will prevent it from being re-added accidentally.
+The `.gitignore` prevents it from being re-added.
+
+---
+
+## 📄 License
+
+MIT License — see [LICENSE](LICENSE) for details.
