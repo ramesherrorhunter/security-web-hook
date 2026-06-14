@@ -8,7 +8,7 @@
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/rameshlodh/security-web-hook.git
+git clone https://github.com/ramesherrorhunter/security-web-hook.git
 
 # 2. Go into the project
 cd security-web-hook
@@ -206,11 +206,11 @@ cd your-project-folder
 mkdir -p .git/hooks
 
 # 3. Download the hook
-curl -o .git/hooks/pre-commit https://raw.githubusercontent.com/rameshlodh/security-web-hook/main/hooks/pre-commit
+curl -o .git/hooks/pre-commit https://raw.githubusercontent.com/ramesherrorhunter/security-web-hook/main/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 
 # 4. Download custom Gitleaks rules
-curl -o .gitleaks.toml https://raw.githubusercontent.com/rameshlodh/security-web-hook/main/.gitleaks.toml
+curl -o .gitleaks.toml https://raw.githubusercontent.com/ramesherrorhunter/security-web-hook/main/.gitleaks.toml
 ```
 
 That's it! Your project now has security scanning on every commit.
@@ -220,7 +220,7 @@ That's it! Your project now has security scanning on every commit.
 ### Or clone and copy manually:
 
 ```bash
-git clone https://github.com/rameshlodh/security-web-hook.git /tmp/sec-hook
+git clone https://github.com/ramesherrorhunter/security-web-hook.git /tmp/sec-hook
 cp /tmp/sec-hook/hooks/pre-commit YOUR_PROJECT/.git/hooks/pre-commit
 cp /tmp/sec-hook/.gitleaks.toml YOUR_PROJECT/.gitleaks.toml
 chmod +x YOUR_PROJECT/.git/hooks/pre-commit
