@@ -199,15 +199,23 @@ Beyond default secret patterns, the hook detects:
 Want to add this hook to **any** existing project? Just run these commands inside your project:
 
 ```bash
-# 1. Download the hook
+# 1. Go into your project (must be a git repo)
+cd your-project-folder
+
+# 2. Create hooks directory (if it doesn't exist)
+mkdir -p .git/hooks
+
+# 3. Download the hook
 curl -o .git/hooks/pre-commit https://raw.githubusercontent.com/rameshlodh/security-web-hook/main/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 
-# 2. Download custom Gitleaks rules
+# 4. Download custom Gitleaks rules
 curl -o .gitleaks.toml https://raw.githubusercontent.com/rameshlodh/security-web-hook/main/.gitleaks.toml
 ```
 
 That's it! Your project now has security scanning on every commit.
+
+> ⚠️ **Important:** You must run these commands **inside a git repository**. If your project isn't a git repo yet, run `git init` first.
 
 ### Or clone and copy manually:
 
