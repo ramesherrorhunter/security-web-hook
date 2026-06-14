@@ -202,15 +202,24 @@ Want to add this hook to **any** existing project? Just run these commands insid
 # 1. Go into your project (must be a git repo)
 cd your-project-folder
 
-# 2. Create hooks directory (if it doesn't exist)
+# 2. Ensure this is a git repo
+git rev-parse --is-inside-work-tree
+
+# 3. Create hooks directory (safe even if exists)
 mkdir -p .git/hooks
 
-# 3. Download the hook
-curl -o .git/hooks/pre-commit https://raw.githubusercontent.com/ramesherrorhunter/security-web-hook/main/hooks/pre-commit
+# 4. Download pre-commit hook
+curl -fsSL \
+https://raw.githubusercontent.com/ramesherrorhunter/security-web-hook/main/hooks/pre-commit \
+-o .git/hooks/pre-commit
+
+# 5. Make hook executable
 chmod +x .git/hooks/pre-commit
 
-# 4. Download custom Gitleaks rules
-curl -o .gitleaks.toml https://raw.githubusercontent.com/ramesherrorhunter/security-web-hook/main/.gitleaks.toml
+# 6. Download Gitleaks config
+curl -fsSL \
+https://raw.githubusercontent.com/ramesherrorhunter/security-web-hook/main/.gitleaks.toml \
+-o .gitleaks.toml
 ```
 
 That's it! Your project now has security scanning on every commit.
