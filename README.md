@@ -194,6 +194,34 @@ Beyond default secret patterns, the hook detects:
 
 ---
 
+## 🚀 Use in Your Own Project
+
+Want to add this hook to **any** existing project? Just run these commands inside your project:
+
+```bash
+# 1. Download the hook
+curl -o .git/hooks/pre-commit https://raw.githubusercontent.com/rameshlodh/security-web-hook/main/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+
+# 2. Download custom Gitleaks rules
+curl -o .gitleaks.toml https://raw.githubusercontent.com/rameshlodh/security-web-hook/main/.gitleaks.toml
+```
+
+That's it! Your project now has security scanning on every commit.
+
+### Or clone and copy manually:
+
+```bash
+git clone https://github.com/rameshlodh/security-web-hook.git /tmp/sec-hook
+cp /tmp/sec-hook/hooks/pre-commit YOUR_PROJECT/.git/hooks/pre-commit
+cp /tmp/sec-hook/.gitleaks.toml YOUR_PROJECT/.gitleaks.toml
+chmod +x YOUR_PROJECT/.git/hooks/pre-commit
+```
+
+> 💡 Each developer on the team needs to run this once. The `.git/hooks/` folder is not pushed to the repo.
+
+---
+
 ## ⚠️ Bypass (emergency only)
 
 ```bash
